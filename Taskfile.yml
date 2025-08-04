@@ -5,8 +5,8 @@ tasks:
   bootstrap:
     cmds:
       - sudo -E ./bootstrap.sh
-      - . $HOME/.bashrc
-      - . $HOME/.venv/bin/activate
+      - source $HOME/.bashrc
+      - source $HOME/.venv/bin/activate
 
   config:
     cmds:
@@ -26,7 +26,7 @@ tasks:
 
   miner:
     cmds:
-      - ENV=DEV uvicorn miner.server:app --reload --host 0.0.0.0 --port 7999 --env-file .1.env --log-level debug
+      - ENV=DEV uvicorn miner.server:app --reload --host 0.0.0.0 --port 56000 --env-file .1.env --log-level debug
 
   trainer:
     cmds:
@@ -58,7 +58,7 @@ tasks:
 
   validator:
     cmds:
-      - . $HOME/.venv/bin/activate
+      - source $HOME/.venv/bin/activate
       - ./utils/setup_grafana.sh
       - docker compose --env-file .vali.env -f docker-compose.yml up -d --build --remove-orphans
       - docker compose rm -f -v grafana
@@ -79,12 +79,12 @@ tasks:
 
   install:
     cmds:
-      - . $HOME/.venv/bin/activate
+      - source $HOME/.venv/bin/activate
       - pip install -e .
 
   auditor:
     cmds:
-      - . $HOME/.venv/bin/activate
+      - source $HOME/.venv/bin/activate
       - pm2 delete auditor || true
       - pm2 start "python -m auditing.audit" --name auditor
 

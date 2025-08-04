@@ -123,9 +123,6 @@ async def run_trainer_container_image(
 
     # Calculate resources based on GPU count
     memory_limit, cpu_limit_nanocpus = calculate_container_resources(gpu_ids)
-    
-    # Set shared memory size based on GPU count
-    shm_size = "16g" if len(gpu_ids) >= 4 else "8g"
 
     try:
         container: Container = client.containers.run(
@@ -136,7 +133,6 @@ async def run_trainer_container_image(
                 cst.VOLUME_NAMES[1]: {"bind": cst.CACHE_ROOT_PATH, "mode": "rw"},
             },
             remove=False,
-            shm_size=shm_size,
             name=container_name,
             mem_limit=memory_limit,
             nano_cpus=cpu_limit_nanocpus,
@@ -195,9 +191,6 @@ async def run_trainer_container_text(
 
     # Calculate resources based on GPU count
     memory_limit, cpu_limit_nanocpus = calculate_container_resources(gpu_ids)
-    
-    # Set shared memory size based on GPU count
-    shm_size = "16g" if len(gpu_ids) >= 4 else "8g"
 
     try:
         container: Container = client.containers.run(
@@ -208,7 +201,6 @@ async def run_trainer_container_text(
                 cst.VOLUME_NAMES[1]: {"bind": cst.CACHE_ROOT_PATH, "mode": "rw"},
             },
             remove=False,
-            shm_size=shm_size,
             name=container_name,
             mem_limit=memory_limit,
             nano_cpus=cpu_limit_nanocpus,

@@ -2,7 +2,7 @@
 # Change each time but take caution
 
 
-. $HOME/.venv/bin/activate
+source $HOME/.venv/bin/activate
 pip install -e .
 
 task validator
