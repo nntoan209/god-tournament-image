@@ -31,7 +31,6 @@ min_bucket_reso = 256
 min_snr_gamma = 5
 mixed_precision = "bf16"
 network_alpha = 32
-network_args = []
 network_dim = 32
 network_module = "networks.lora"
 network_args = ["conv_dim=4", "conv_alpha=4", "dropout=null"]
