@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import trainer.constants as train_cst
+from trainer.utils.style_detection import detect_styles_in_prompts
 from core.models.utility_models import DpoDatasetType
 from core.models.utility_models import GrpoDatasetType
 from core.models.utility_models import InstructTextDatasetType
@@ -21,10 +22,25 @@ def get_image_base_model_path(model_id: str) -> str:
 def get_image_training_images_dir(task_id: str) -> str:
     return str(Path(train_cst.IMAGE_CONTAINER_IMAGES_PATH) / task_id / "img")
 
-def get_image_training_config_template_path(model_type: str) -> str:
+def get_image_training_config_template_path(model_type: str, train_data_dir: str) -> str:
     model_type = model_type.lower()
     if model_type == ImageModelType.SDXL.value:
-        return str(Path(train_cst.IMAGE_CONTAINER_CONFIG_TEMPLATE_PATH) / "base_diffusion_sdxl.toml")
+        prompts_path = os.path.join(train_data_dir, "10_lora style")
+        prompts = []
+        for file in os.listdir(prompts_path):
+            if file.endswith(".txt"):
+                with open(os.path.join(prompts_path, file), "r") as f:
+                    prompt = f.read().strip()
+                    prompts.append(prompt)
+
+        styles = detect_styles_in_prompts(prompts)
+        print(f"Styles: {styles}")
+
+        if styles:
+            return str(Path(train_cst.IMAGE_CONTAINER_CONFIG_TEMPLATE_PATH) / "base_diffusion_sdxl_style.toml")
+        else:
+            return str(Path(train_cst.IMAGE_CONTAINER_CONFIG_TEMPLATE_PATH) / "base_diffusion_sdxl_person.toml")
+
     elif model_type == ImageModelType.FLUX.value:
         return str(Path(train_cst.IMAGE_CONTAINER_CONFIG_TEMPLATE_PATH) / "base_diffusion_flux.toml")
 

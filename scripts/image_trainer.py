@@ -33,15 +33,18 @@ def get_model_path(path: str) -> str:
     return path
 
 def create_config(task_id, model, model_type, expected_repo_name):
+    """Get the training data directory"""
+    train_data_dir = train_paths.get_image_training_images_dir(task_id)
+
     """Create the diffusion config file"""
-    config_template_path = train_paths.get_image_training_config_template_path(model_type)
+    config_template_path = train_paths.get_image_training_config_template_path(model_type, train_data_dir)
 
     with open(config_template_path, "r") as file:
         config = toml.load(file)
 
     # Update config
     config["pretrained_model_name_or_path"] = model
-    config["train_data_dir"] = train_paths.get_image_training_images_dir(task_id)
+    config["train_data_dir"] = train_data_dir
     output_dir = train_paths.get_checkpoints_output_path(task_id, expected_repo_name)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok=True)
@@ -112,14 +115,6 @@ async def main():
 
     model_path = train_paths.get_image_base_model_path(args.model)
 
-    # Create config file
-    config_path = create_config(
-        args.task_id,
-        model_path,
-        args.model_type,
-        args.expected_repo_name,
-    )
-
     # Prepare dataset
     print("Preparing dataset...", flush=True)
 
@@ -130,6 +125,14 @@ async def main():
         class_prompt=cst.DIFFUSION_DEFAULT_CLASS_PROMPT,
         job_id=args.task_id,
         output_dir=train_cst.IMAGE_CONTAINER_IMAGES_PATH
+    )
+
+    # Create config file
+    config_path = create_config(
+        args.task_id,
+        model_path,
+        args.model_type,
+        args.expected_repo_name,
     )
 
     # Run training
